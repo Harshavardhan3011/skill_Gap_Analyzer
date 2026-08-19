@@ -1,0 +1,38 @@
+Job Title: Full Stack Developer
+Company: TechCorp Solutions
+Location: Remote / Hybrid
+
+ABOUT THE ROLE
+We are looking for a skilled Full Stack Developer to join our growing engineering team.
+You will be responsible for building scalable web applications using modern technologies.
+
+REQUIRED SKILLS
+The ideal candidate must have:
+- Strong proficiency in Python and JavaScript
+- Experience with React for frontend development
+- Node.js and Express.js for backend development
+- MongoDB for NoSQL database design
+- SQL and relational database knowledge
+- REST API design and implementation
+- Git for version control
+
+PREFERRED SKILLS
+Nice to have:
+- Docker for containerization
+- AWS cloud deployment experience
+- Redis for caching
+- CI/CD pipeline experience (GitHub Actions)
+- TypeScript
+- Kubernetes
+
+RESPONSIBILITIES
+- Design and develop full-stack features from scratch
+- Build RESTful APIs consumed by frontend applications
+- Work with MongoDB and SQL databases
+- Containerize applications using Docker
+- Participate in code reviews and Agile ceremonies
+- Write unit tests and integration tests
+
+QUALIFICATIONS
+- 2+ years of full-stack development experience
+- Bachelor's degree in Computer Science or equivalent

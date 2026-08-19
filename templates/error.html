@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Error {{ error_code }} — SkillGap Analyzer{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+  <div class="error-page">
+    <div class="error-code">{{ error_code or 'Error' }}</div>
+    <h1 class="error-title">Something went wrong</h1>
+    <p class="error-message">{{ error_message or 'An unexpected error occurred.' }}</p>
+    <div class="error-actions">
+      <a href="{{ url_for('main.index') }}" class="btn btn-primary" id="errorHomeBtn">Go Home</a>
+      <a href="javascript:history.back()" class="btn btn-outline" id="errorBackBtn">Go Back</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

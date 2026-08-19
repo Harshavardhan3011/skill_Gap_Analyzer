@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}Analysis History — SkillGap Analyzer{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+  <div class="page-header">
+    <h1 class="page-title">Analysis History</h1>
+    <p class="page-sub">View, search, and manage your previous skill gap analyses.</p>
+  </div>
+
+  <!-- ── Search & Sort ──────────────────────────────────────────────────── -->
+  <form method="GET" action="{{ url_for('analysis.history') }}" class="history-controls" id="historySearchForm">
+    <div class="history-search-row">
+      <input
+        type="text"
+        name="search"
+        id="historySearch"
+        class="form-control search-input"
+        placeholder="🔍 Search by name or role…"
+        value="{{ search }}"
+      />
+      <select name="sort_by" class="form-control sort-select" id="historySortBy">
+        <option value="created_at" {% if sort_by == 'created_at' %}selected{% endif %}>Sort: Date</option>
+        <option value="match_score" {% if sort_by == 'match_score' %}selected{% endif %}>Sort: Score</option>
+        <option value="candidate_name" {% if sort_by == 'candidate_name' %}selected{% endif %}>Sort: Name</option>
+        <option value="target_role" {% if sort_by == 'target_role' %}selected{% endif %}>Sort: Role</option>
+        <option value="missing_count" {% if sort_by == 'missing_count' %}selected{% endif %}>Sort: Missing Skills</option>
+      </select>
+      <select name="order" class="form-control sort-select" id="historyOrder">
+        <option value="desc" {% if order == 'desc' %}selected{% endif %}>↓ Descending</option>
+        <option value="asc" {% if order == 'asc' %}selected{% endif %}>↑ Ascending</option>
+      </select>
+      <button type="submit" class="btn btn-primary" id="historySearchBtn">Search</button>
+      {% if search %}
+      <a href="{{ url_for('analysis.history') }}" class="btn btn-outline" id="historyClearBtn">Clear</a>
+      {% endif %}
+    </div>
+  </form>
+
+  <!-- ── Stats bar ──────────────────────────────────────────────────────── -->
+  <div class="history-stats">
+    <span class="stat-text">
+      Showing <strong>{{ analyses | length }}</strong>
+      of <strong>{{ total }}</strong> analyses
+      {% if search %}for "<em>{{ search }}</em>"{% endif %}
+    </span>
+    <a href="{{ url_for('analysis.analyze') }}" class="btn btn-primary btn-sm" id="newAnalysisHistBtn">
+      + New Analysis
+    </a>
+  </div>
+
+  <!-- ── Table ──────────────────────────────────────────────────────────── -->
+  {% if analyses %}
+  <div class="table-wrapper">
+    <table class="data-table" id="historyTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Candidate</th>
+          <th>Target Role</th>
+          <th>Date</th>
+          <th>Score</th>
+          <th>Matched</th>
+          <th>Partial</th>
+          <th>Missing</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in analyses %}
+        <tr class="history-row">
+          <td class="id-cell">#{{ a.id }}</td>
+          <td>{{ a.candidate_name }}</td>
+          <td>{{ a.target_role }}</td>
+          <td class="date-cell">{{ a.created_at }}</td>
+          <td>
+            <span class="score-pill
+              {% if a.match_score >= 80 %}score-success
+              {% elif a.match_score >= 60 %}score-good
+              {% elif a.match_score >= 40 %}score-warning
+              {% else %}score-danger{% endif %}">
+              {{ a.match_score }}%
+            </span>
+          </td>
+          <td class="text-matched">{{ a.matched_count }}</td>
+          <td class="text-partial">{{ a.partial_count }}</td>
+          <td class="text-missing">{{ a.missing_count }}</td>
+          <td>
+            <div class="action-btns">
+              <a href="{{ url_for('analysis.result', analysis_id=a.id) }}"
+                 class="btn btn-sm btn-outline" id="viewBtn{{ a.id }}">
+                View
+              </a>
+              <form method="POST"
+                    action="{{ url_for('analysis.delete_analysis', analysis_id=a.id) }}"
+                    class="delete-form"
+                    onsubmit="return confirmDelete({{ a.id }})">
+                <button type="submit" class="btn btn-sm btn-danger"
+                        id="deleteBtn{{ a.id }}">
+                  Delete
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── Pagination ────────────────────────────────────────────────────── -->
+  {% if pages > 1 %}
+  <div class="pagination">
+    {% if page > 1 %}
+    <a href="{{ url_for('analysis.history', page=page-1, search=search, sort_by=sort_by, order=order) }}"
+       class="page-btn" id="prevPageBtn">← Prev</a>
+    {% endif %}
+
+    {% for p in range(1, pages + 1) %}
+    <a href="{{ url_for('analysis.history', page=p, search=search, sort_by=sort_by, order=order) }}"
+       class="page-btn {% if p == page %}page-active{% endif %}"
+       id="pageBtn{{ p }}">{{ p }}</a>
+    {% endfor %}
+
+    {% if page < pages %}
+    <a href="{{ url_for('analysis.history', page=page+1, search=search, sort_by=sort_by, order=order) }}"
+       class="page-btn" id="nextPageBtn">Next →</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% else %}
+  <!-- Empty state -->
+  <div class="empty-state">
+    <div class="empty-icon">📭</div>
+    <h3>No analyses yet</h3>
+    {% if search %}
+    <p>No results found for "<strong>{{ search }}</strong>".</p>
+    <a href="{{ url_for('analysis.history') }}" class="btn btn-outline">Clear search</a>
+    {% else %}
+    <p>Run your first skill gap analysis to see it here.</p>
+    <a href="{{ url_for('analysis.analyze') }}" class="btn btn-primary" id="firstAnalysisBtn">
+      Start Analysis →
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmDelete(id) {
+  return confirm('Delete analysis #' + id + '? This cannot be undone.');
+}
+</script>
+{% endblock %}

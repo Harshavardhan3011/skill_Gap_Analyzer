@@ -1,0 +1,32 @@
+John Smith
+Full Stack Developer Candidate
+
+SUMMARY
+Enthusiastic software developer with 2 years of experience building web applications.
+Proficient in Python, JavaScript, React, and SQL databases.
+
+SKILLS
+- Python, JavaScript, HTML, CSS
+- React, Redux
+- SQL, MySQL
+- REST API design and consumption
+- Git, GitHub
+- Agile / Scrum
+- Unit Testing with pytest and Jest
+- OOP principles, Data Structures
+
+EXPERIENCE
+Junior Web Developer — ABC Tech (2022–2024)
+  - Built and maintained React frontends
+  - Developed Python Flask REST APIs
+  - Used MySQL for data storage
+  - Collaborated with team using Git and GitHub
+  - Participated in Agile sprints
+
+EDUCATION
+B.Tech Computer Science — XYZ University (2022)
+
+PROJECTS
+1. Task Manager App — Python Flask backend, React frontend, MySQL
+2. Portfolio Website — HTML, CSS, JavaScript
+3. Data Dashboard — Python, Pandas, Matplotlib

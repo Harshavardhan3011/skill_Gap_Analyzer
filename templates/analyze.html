@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}New Analysis — SkillGap Analyzer{% endblock %}
+{% block meta_description %}Enter your resume and job description to get a detailed skill gap analysis.{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+  <div class="page-header">
+    <h1 class="page-title">New Skill Gap Analysis</h1>
+    <p class="page-sub">Fill in your details below. You can paste text or upload a file.</p>
+  </div>
+
+  <form action="{{ url_for('analysis.analyze') }}" method="POST"
+        enctype="multipart/form-data" id="analyzeForm" novalidate>
+
+    <!-- ── Candidate Details ─────────────────────────────────────────── -->
+    <div class="form-section">
+      <h2 class="form-section-title">Candidate Details</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="candidate_name">
+            Candidate Name <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            id="candidate_name"
+            name="candidate_name"
+            class="form-control"
+            placeholder="e.g. John Smith"
+            value="{{ form_data.candidate_name if form_data else '' }}"
+            maxlength="100"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="target_role">
+            Target Role <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            id="target_role"
+            name="target_role"
+            class="form-control"
+            placeholder="e.g. Full Stack Developer"
+            value="{{ form_data.target_role if form_data else '' }}"
+            maxlength="100"
+            required
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Resume Input ──────────────────────────────────────────────── -->
+    <div class="form-section">
+      <h2 class="form-section-title">Resume / Candidate Information</h2>
+
+      <!-- Tab switcher -->
+      <div class="input-tabs" role="tablist">
+        <button type="button" class="tab-btn active" role="tab"
+                data-tab="resume-text" id="resumeTextTab">
+          📝 Paste Text
+        </button>
+        <button type="button" class="tab-btn" role="tab"
+                data-tab="resume-file" id="resumeFileTab">
+          📁 Upload File
+        </button>
+      </div>
+
+      <div class="tab-content active" id="resume-text">
+        <label class="form-label" for="resume_text">
+          Resume Text <span class="required">*</span>
+        </label>
+        <textarea
+          id="resume_text"
+          name="resume_text"
+          class="form-control textarea-lg"
+          placeholder="Paste your resume or list of skills here...&#10;&#10;Example:&#10;Skills: Python, JavaScript, React, SQL, Git&#10;Experience: 2 years web development..."
+          rows="12"
+        >{{ form_data.resume_text if form_data else '' }}</textarea>
+        <p class="form-hint">Paste the full text of your resume, or just list your skills.</p>
+      </div>
+
+      <div class="tab-content" id="resume-file">
+        <label class="form-label" for="resume_file">
+          Upload Resume File
+        </label>
+        <div class="file-drop-zone" id="resumeDropZone">
+          <input type="file" id="resume_file" name="resume_file"
+                 class="file-input" accept=".txt,.pdf" />
+          <div class="file-drop-content">
+            <span class="file-icon">📄</span>
+            <p>Drag &amp; drop your file here, or <span class="file-browse">browse</span></p>
+            <p class="file-hint">Supported: .txt, .pdf (max 2 MB)</p>
+          </div>
+          <div class="file-selected" id="resumeFileSelected" style="display:none">
+            <span class="file-icon">✓</span>
+            <span id="resumeFileName">No file selected</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Job Description Input ─────────────────────────────────────── -->
+    <div class="form-section">
+      <h2 class="form-section-title">Job Description</h2>
+
+      <div class="input-tabs" role="tablist">
+        <button type="button" class="tab-btn active" role="tab"
+                data-tab="jd-text" id="jdTextTab">
+          📝 Paste Text
+        </button>
+        <button type="button" class="tab-btn" role="tab"
+                data-tab="jd-file" id="jdFileTab">
+          📁 Upload File
+        </button>
+      </div>
+
+      <div class="tab-content active" id="jd-text">
+        <label class="form-label" for="jd_text">
+          Job Description Text <span class="required">*</span>
+        </label>
+        <textarea
+          id="jd_text"
+          name="jd_text"
+          class="form-control textarea-lg"
+          placeholder="Paste the full job description here...&#10;&#10;Tip: Include sections labelled 'Required Skills' and 'Preferred Skills' for better accuracy."
+          rows="12"
+        >{{ form_data.jd_text if form_data else '' }}</textarea>
+        <p class="form-hint">
+          Include "Required Skills" and "Preferred Skills" sections for better classification.
+        </p>
+      </div>
+
+      <div class="tab-content" id="jd-file">
+        <label class="form-label" for="jd_file">
+          Upload JD File
+        </label>
+        <div class="file-drop-zone" id="jdDropZone">
+          <input type="file" id="jd_file" name="jd_file"
+                 class="file-input" accept=".txt,.pdf" />
+          <div class="file-drop-content">
+            <span class="file-icon">📄</span>
+            <p>Drag &amp; drop your file here, or <span class="file-browse">browse</span></p>
+            <p class="file-hint">Supported: .txt, .pdf (max 2 MB)</p>
+          </div>
+          <div class="file-selected" id="jdFileSelected" style="display:none">
+            <span class="file-icon">✓</span>
+            <span id="jdFileName">No file selected</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Sample data notice ────────────────────────────────────────── -->
+    <div class="info-box">
+      <strong>💡 Try with sample data:</strong>
+      Sample resume and JD files are in
+      <code>data/sample_data/</code> for quick testing.
+    </div>
+
+    <!-- ── Submit ────────────────────────────────────────────────────── -->
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+        <span class="btn-text">Run Analysis →</span>
+        <span class="btn-spinner" style="display:none">Analyzing…</span>
+      </button>
+      <a href="{{ url_for('main.index') }}" class="btn btn-outline btn-lg">Cancel</a>
+    </div>
+
+  </form>
+</div>
+{% endblock %}

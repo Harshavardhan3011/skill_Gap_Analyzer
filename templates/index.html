@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}SkillGap Analyzer — Find Your Skill Gaps{% endblock %}
+
+{% block content %}
+<!-- ── Hero ─────────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">✦ Project #58 — Learn Depth ML Internship</div>
+    <h1 class="hero-title">
+      Know Your <span class="text-accent">Skill Gaps.</span><br>
+      Build Your Future.
+    </h1>
+    <p class="hero-subtitle">
+      Compare your resume against any job description in seconds.
+      Get a detailed, prioritized gap report — completely free, 100% offline.
+    </p>
+    <div class="hero-actions">
+      <a href="{{ url_for('analysis.analyze') }}" class="btn btn-primary btn-lg" id="heroAnalyzeBtn">
+        Start Analysis →
+      </a>
+      <a href="{{ url_for('analysis.history') }}" class="btn btn-outline btn-lg" id="heroHistoryBtn">
+        View History
+      </a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="skill-demo-card">
+      <div class="demo-row demo-matched">
+        <span class="demo-dot dot-matched"></span>
+        <span>Python</span>
+        <span class="demo-badge badge-matched">Matched</span>
+      </div>
+      <div class="demo-row demo-partial">
+        <span class="demo-dot dot-partial"></span>
+        <span>React</span>
+        <span class="demo-badge badge-partial">Partial</span>
+      </div>
+      <div class="demo-row demo-missing">
+        <span class="demo-dot dot-missing"></span>
+        <span>Docker</span>
+        <span class="demo-badge badge-missing">Missing</span>
+      </div>
+      <div class="demo-score">
+        <span class="demo-score-label">Match Score</span>
+        <span class="demo-score-value">68%</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── How it works ──────────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">How It Works</h2>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">01</div>
+        <h3 class="step-title">Input Resume &amp; JD</h3>
+        <p class="step-desc">Paste your resume text or upload a file. Do the same for the job description.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">02</div>
+        <h3 class="step-title">Skill Extraction</h3>
+        <p class="step-desc">Our rule-based engine extracts 80+ skills and normalizes aliases (JS → JavaScript).</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">03</div>
+        <h3 class="step-title">Gap Analysis</h3>
+        <p class="step-desc">Skills are classified as Matched, Partial, or Missing with a scored percentage.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">04</div>
+        <h3 class="step-title">Priority Roadmap</h3>
+        <p class="step-desc">Get a learning roadmap that prioritizes exactly which skills to tackle first.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ─────────────────────────────────────────────────────────── -->
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title">Key Features</h2>
+    <div class="features-grid">
+      <div class="feature-card" id="featureExtraction">
+        <div class="feature-icon">🔍</div>
+        <h3>Smart Extraction</h3>
+        <p>Identifies 80+ skills across 7 categories with n-gram matching.</p>
+      </div>
+      <div class="feature-card" id="featureNormalization">
+        <div class="feature-icon">🔄</div>
+        <h3>Alias Normalization</h3>
+        <p>JS, Javascript, ReactJS — all correctly mapped to their canonical names.</p>
+      </div>
+      <div class="feature-card" id="featureScoring">
+        <div class="feature-icon">📊</div>
+        <h3>Transparent Scoring</h3>
+        <p>Weighted formula: Matched×1.0 + Partial×0.5, clearly documented.</p>
+      </div>
+      <div class="feature-card" id="featurePriority">
+        <div class="feature-icon">🎯</div>
+        <h3>Priority Ranking</h3>
+        <p>HIGH / MEDIUM / LOW based on role requirements, frequency, and category.</p>
+      </div>
+      <div class="feature-card" id="featureRoadmap">
+        <div class="feature-icon">🗺️</div>
+        <h3>Learning Roadmap</h3>
+        <p>Prerequisite-aware recommended learning sequence for missing skills.</p>
+      </div>
+      <div class="feature-card" id="featureHistory">
+        <div class="feature-icon">💾</div>
+        <h3>Analysis History</h3>
+        <p>All analyses saved in SQLite. Search, sort, and revisit past reports.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ──────────────────────────────────────────────────────────────── -->
+<section class="section cta-section">
+  <div class="container cta-container">
+    <h2 class="cta-title">Ready to find your skill gaps?</h2>
+    <p class="cta-sub">Takes less than 2 minutes. No account required.</p>
+    <a href="{{ url_for('analysis.analyze') }}" class="btn btn-primary btn-lg" id="ctaAnalyzeBtn">
+      Start Free Analysis →
+    </a>
+  </div>
+</section>
+{% endblock %}

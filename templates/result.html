@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block title %}Analysis Result — {{ result.candidate_name }} | SkillGap Analyzer{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+
+  <!-- ── Page header ────────────────────────────────────────────────────── -->
+  <div class="result-header">
+    <div class="result-meta">
+      <h1 class="page-title">Skill Gap Report</h1>
+      <p class="result-subtitle">
+        <strong>{{ result.candidate_name }}</strong> →
+        <strong>{{ result.target_role }}</strong>
+        {% if result.created_at %}
+          <span class="result-date">· {{ result.created_at }}</span>
+        {% endif %}
+      </p>
+    </div>
+    <div class="result-actions">
+      <a href="{{ url_for('analysis.analyze') }}" class="btn btn-primary btn-sm" id="newAnalysisBtn">
+        New Analysis
+      </a>
+      <a href="{{ url_for('analysis.history') }}" class="btn btn-outline btn-sm" id="viewHistoryBtn">
+        View History
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Summary Cards ──────────────────────────────────────────────────── -->
+  <div class="summary-grid">
+    <div class="summary-card score-card score-{{ result.score_color if result.score_color else 'warning' }}">
+      <div class="score-circle">
+        <span class="score-number">{{ result.match_score | round(1) }}%</span>
+        <span class="score-label-sm">Match</span>
+      </div>
+      <div class="score-info">
+        <p class="score-verdict">{{ result.score_label if result.score_label else 'Fair' }}</p>
+        <p class="score-formula">{{ result.score_breakdown.formula if result.score_breakdown else '' }}</p>
+      </div>
+    </div>
+
+    <div class="summary-card stat-card stat-matched">
+      <div class="stat-number">{{ result.matched_count }}</div>
+      <div class="stat-label">Matched Skills</div>
+      <div class="stat-icon">✓</div>
+    </div>
+
+    <div class="summary-card stat-card stat-partial">
+      <div class="stat-number">{{ result.partial_count }}</div>
+      <div class="stat-label">Partial Skills</div>
+      <div class="stat-icon">◑</div>
+    </div>
+
+    <div class="summary-card stat-card stat-missing">
+      <div class="stat-number">{{ result.missing_count }}</div>
+      <div class="stat-label">Missing Skills</div>
+      <div class="stat-icon">✕</div>
+    </div>
+  </div>
+
+  <!-- ── Filter/Search bar ─────────────────────────────────────────────── -->
+  <div class="filter-bar">
+    <input type="text" id="skillSearch" class="form-control search-input"
+           placeholder="🔍 Search skills…" />
+    <div class="filter-pills" role="group" aria-label="Skill filter">
+      <button class="pill active" data-filter="all" id="filterAll">All</button>
+      <button class="pill pill-matched" data-filter="matched" id="filterMatched">Matched</button>
+      <button class="pill pill-partial" data-filter="partial" id="filterPartial">Partial</button>
+      <button class="pill pill-missing" data-filter="missing" id="filterMissing">Missing</button>
+      <button class="pill pill-high" data-filter="HIGH" id="filterHigh">High Priority</button>
+      <button class="pill pill-medium" data-filter="MEDIUM" id="filterMedium">Med Priority</button>
+      <button class="pill pill-low" data-filter="LOW" id="filterLow">Low Priority</button>
+    </div>
+    <select id="skillSort" class="form-control sort-select" aria-label="Sort skills">
+      <option value="status">Sort: Status</option>
+      <option value="priority">Sort: Priority</option>
+      <option value="alpha">Sort: A → Z</option>
+    </select>
+  </div>
+
+  <!-- ── Skills Sections ───────────────────────────────────────────────── -->
+  <div class="skills-sections" id="skillsSections">
+
+    <!-- Matched -->
+    {% if result.matched_skills %}
+    <div class="skills-group" id="matchedGroup">
+      <h2 class="group-title group-matched">
+        <span class="group-icon">✓</span> Matched Skills
+        <span class="group-count">{{ result.matched_count }}</span>
+      </h2>
+      <div class="skills-grid skill-items" data-status="matched">
+        {% for skill in result.matched_skills %}
+        <div class="skill-badge badge-matched skill-item"
+             data-status="matched"
+             data-priority=""
+             data-name="{{ skill.name }}">
+          <span class="badge-icon">✓</span>
+          <span class="badge-name">{{ skill.name | title }}</span>
+          <span class="badge-category">{{ skill.category }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Partial -->
+    {% if result.partial_skills %}
+    <div class="skills-group" id="partialGroup">
+      <h2 class="group-title group-partial">
+        <span class="group-icon">◑</span> Partial Skills
+        <span class="group-count">{{ result.partial_count }}</span>
+      </h2>
+      <div class="skills-grid skill-items" data-status="partial">
+        {% for skill in result.partial_skills %}
+        <div class="skill-badge badge-partial skill-item"
+             data-status="partial"
+             data-priority="{{ skill.priority }}"
+             data-name="{{ skill.name }}">
+          <span class="badge-icon">◑</span>
+          <span class="badge-name">{{ skill.name | title }}</span>
+          <span class="badge-category">{{ skill.category }}</span>
+          {% if skill.priority_reason %}
+          <span class="badge-tooltip">{{ skill.priority_reason }}</span>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Missing -->
+    {% if result.missing_skills %}
+    <div class="skills-group" id="missingGroup">
+      <h2 class="group-title group-missing">
+        <span class="group-icon">✕</span> Missing Skills
+        <span class="group-count">{{ result.missing_count }}</span>
+      </h2>
+      <div class="skills-grid skill-items" data-status="missing">
+        {% for skill in result.missing_skills %}
+        <div class="skill-badge badge-missing skill-item"
+             data-status="missing"
+             data-priority="{{ skill.priority }}"
+             data-name="{{ skill.name }}">
+          <span class="badge-icon">✕</span>
+          <span class="badge-name">{{ skill.name | title }}</span>
+          <span class="badge-category">{{ skill.category }}</span>
+          {% if skill.priority %}
+          <span class="priority-tag tag-{{ skill.priority | lower }}">{{ skill.priority }}</span>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if not result.matched_skills and not result.partial_skills and not result.missing_skills %}
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h3>No skills detected</h3>
+      <p>Try adding more specific skill names to your resume or JD.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ── Priority Table ────────────────────────────────────────────────── -->
+  {% if result.priority_skills %}
+  <div class="section-card" id="prioritySection">
+    <h2 class="section-card-title">📋 Priority Skill Table</h2>
+    <p class="section-card-sub">Missing and partial skills ranked by priority for your target role.</p>
+    <div class="table-wrapper">
+      <table class="data-table" id="priorityTable">
+        <thead>
+          <tr>
+            <th>Skill</th>
+            <th>Category</th>
+            <th>Importance</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for skill in result.priority_skills %}
+          <tr class="priority-row priority-{{ skill.priority | lower }}">
+            <td><strong>{{ skill.name | title }}</strong></td>
+            <td>{{ skill.category }}</td>
+            <td>
+              <span class="importance-tag importance-{{ skill.importance }}">
+                {{ skill.importance | title }}
+              </span>
+            </td>
+            <td>
+              <span class="status-tag status-{{ skill.status }}">
+                {{ skill.status | title }}
+              </span>
+            </td>
+            <td>
+              <span class="priority-tag tag-{{ skill.priority | lower }}">
+                {{ skill.priority }}
+              </span>
+            </td>
+            <td class="reason-cell">{{ skill.priority_reason }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ── Learning Roadmap ───────────────────────────────────────────────── -->
+  {% if result.roadmap %}
+  <div class="section-card" id="roadmapSection">
+    <h2 class="section-card-title">🗺️ Recommended Learning Roadmap</h2>
+    <p class="section-card-sub">
+      Prerequisite-aware learning sequence — start from step 1 and work your way down.
+    </p>
+    <div class="roadmap-list">
+      {% for item in result.roadmap %}
+      <div class="roadmap-item">
+        <div class="roadmap-step">{{ item.order }}</div>
+        <div class="roadmap-content">
+          <div class="roadmap-skill">{{ item.skill | title }}</div>
+          <div class="roadmap-category">{{ item.category }}</div>
+          <div class="roadmap-reason">{{ item.reason }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ── Candidate Skills ───────────────────────────────────────────────── -->
+  <div class="section-card">
+    <h2 class="section-card-title">👤 Detected Candidate Skills</h2>
+    <div class="skills-grid">
+      {% for skill in result.candidate_skills %}
+      <span class="skill-chip">{{ skill | title }}</span>
+      {% else %}
+      <p class="text-muted">No skills detected from the resume.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}
