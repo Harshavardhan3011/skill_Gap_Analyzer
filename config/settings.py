@@ -13,10 +13,16 @@ UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 
 # ── Flask ────────────────────────────────────────────────────────────────────
 SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "skillgap-dev-secret-2024-local-only")
-DEBUG = os.environ.get("FLASK_DEBUG", "true").lower() == "true"
+DEBUG = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
 
-# ── Database ─────────────────────────────────────────────────────────────────
-DATABASE_PATH = os.path.join(DATABASE_DIR, "skillgap.db")
+# ── Database ───────────────────────────────────────────────────────────────
+# On Vercel the project filesystem is read-only; use /tmp (ephemeral per-invocation).
+# Locally, keep the database in database/skillgap.db as before.
+_IS_VERCEL = os.environ.get("VERCEL", "") != ""
+if _IS_VERCEL:
+    DATABASE_PATH = "/tmp/skillgap.db"
+else:
+    DATABASE_PATH = os.path.join(DATABASE_DIR, "skillgap.db")
 
 # ── File uploads ──────────────────────────────────────────────────────────────
 ALLOWED_EXTENSIONS = {"txt", "pdf"}

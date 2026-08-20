@@ -81,7 +81,12 @@ def create_app() -> Flask:
     return app
 
 
+# ── Module-level instance ─────────────────────────────────────────────────────
+# Must be at module scope so Vercel (and any WSGI server) can discover `app`
+# when it imports this file directly (rather than running it as a script).
+app = create_app()
+
+
 # ── Entry point ───────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    app = create_app()
     app.run(host="127.0.0.1", port=5000, debug=DEBUG)

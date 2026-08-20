@@ -37,6 +37,10 @@ htmlcov/
 *.log
 
 # Secrets — never commit
+.env
 *.env
 .env.*
 secrets.py
+
+# Vercel CLI local cache
+.vercel/

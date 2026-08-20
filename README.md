@@ -28,6 +28,7 @@ A web-based application that compares candidate skills against job description r
 18. [Limitations](#limitations)
 19. [Future Improvements](#future-improvements)
 20. [Learning Outcomes](#learning-outcomes)
+21. [Deployment](#deployment)
 
 ---
 
@@ -438,3 +439,52 @@ By building this project, I learned and applied:
 - pytest unit and integration testing
 - Modular code organization
 - Professional project documentation
+
+---
+
+## 21. Deployment
+
+### Local Development
+
+```bash
+# Create virtual environment
+python -m venv .venv
+.venv\Scripts\activate       # Windows
+# source .venv/bin/activate  # macOS/Linux
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run
+python app.py
+```
+
+Visit [http://127.0.0.1:5000](http://127.0.0.1:5000)
+
+### Vercel Deployment
+
+This project is configured for one-click deployment on Vercel via `vercel.json`.
+
+1. Push this repository to GitHub
+2. Import it at [vercel.com/new](https://vercel.com/new)
+3. Vercel auto-detects Python and installs `requirements.txt`
+4. Set the `FLASK_SECRET_KEY` environment variable in Vercel → Settings → Environment Variables
+5. Click **Deploy**
+
+See [`VERCEL_DEPLOYMENT.md`](VERCEL_DEPLOYMENT.md) for full step-by-step instructions.
+
+### Environment Variables
+
+| Variable | Description | Default |
+|---|---|---|
+| `FLASK_SECRET_KEY` | Session signing key (set a strong random value in production) | dev fallback key |
+| `FLASK_DEBUG` | Enable debug mode (`true`/`false`) | `false` |
+
+### Deployment Notes
+
+> **SQLite persistence on Vercel:** Vercel runs Flask as a serverless function. The SQLite
+> database is stored in `/tmp` (ephemeral) on Vercel and **will not persist** reliably between
+> requests or deployments. The analyze → result flow works correctly within a single request
+> chain. The history page may appear empty after a cold start. For persistent production history,
+> a hosted database (PostgreSQL, MySQL) would be required.
+> Locally, `database/skillgap.db` persists normally across runs.
