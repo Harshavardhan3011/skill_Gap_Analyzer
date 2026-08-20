@@ -44,7 +44,12 @@ class FileHandler:
 
     def __init__(self, upload_folder: str = UPLOAD_FOLDER) -> None:
         self.upload_folder = upload_folder
-        os.makedirs(self.upload_folder, exist_ok=True)
+        try:
+            os.makedirs(self.upload_folder, exist_ok=True)
+        except OSError as exc:
+            # On read-only filesystems (e.g. Vercel /var/task) this is non-fatal;
+            # file uploads simply won't be saved to disk (they are processed in-memory).
+            logger.warning("Could not create upload folder %s: %s", self.upload_folder, exc)
 
     def read_uploaded_file(self, file_storage) -> Tuple[bool, str]:
         """

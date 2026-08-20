@@ -9,7 +9,14 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 DATABASE_DIR = os.path.join(BASE_DIR, "database")
-UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+
+# ── Vercel detection ───────────────────────────────────────────────────────────
+# Vercel sets this env var automatically. /var/task (the project dir) is
+# read-only; only /tmp is writable. Redirect all runtime writes there.
+_IS_VERCEL = os.environ.get("VERCEL", "") != ""
+
+# Upload folder: writable on both local and Vercel
+UPLOAD_FOLDER = "/tmp/uploads" if _IS_VERCEL else os.path.join(BASE_DIR, "uploads")
 
 # ── Flask ────────────────────────────────────────────────────────────────────
 SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "skillgap-dev-secret-2024-local-only")
@@ -18,7 +25,6 @@ DEBUG = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
 # ── Database ───────────────────────────────────────────────────────────────
 # On Vercel the project filesystem is read-only; use /tmp (ephemeral per-invocation).
 # Locally, keep the database in database/skillgap.db as before.
-_IS_VERCEL = os.environ.get("VERCEL", "") != ""
 if _IS_VERCEL:
     DATABASE_PATH = "/tmp/skillgap.db"
 else:
